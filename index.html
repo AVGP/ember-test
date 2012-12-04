@@ -30,7 +30,7 @@
             <p>This is the allmighty account content</p>
             <ul>
             {{#each account in controller}}
-                <li><a{{action showAccount account}} >{{account.name}}</a></li>
+                <li><a {{action showAccount account}} >{{account.name}}</a></li>
             {{/each}}            
             </ul>
         </script>
