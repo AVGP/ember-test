@@ -3,13 +3,12 @@ var App = Ember.Application.create();
 App.accounts = [];
 
 App.Account = Ember.Object.extend({
-    name: "Account",
-    transactions: [],
     balance: function() {
         var sum = 0;
         var transactions = this.get("transactions");
         for(var i=0,len=transactions.get("length"); i<len; i++)
             sum += transactions[i].get("amount");
+        return sum;
     }.property("transactions.@each")
 });
 
@@ -21,18 +20,19 @@ App.Transaction = Ember.Object.extend({
 for(var a=0; a<3; a++) {
     var account = App.Account.create({
         id: a + 1,
-        name: "Account #" + a,
-        transactions: []
+        transactions: [],
+        name: "Account #" + a
     });
     App.accounts.push(account);
     for(var t=0; t<3; t++) {
         var transaction = App.Transaction.create({
            subject: "Transaction #" + t + " on account #" + a,
-           amount: 100 * (t +1),
+           amount: 100 * (a + 1) * (t +1),
            id: a + t + 1
         });
         App.accounts[a].transactions.push(transaction);
     }
+    console.log(App.accounts[a].get("balance"));
 }
 
 //Generic + Navigation
@@ -93,6 +93,7 @@ App.Router = Ember.Router.extend({
     specificAccount: Ember.Route.extend({
       route: '/accounts/:id',
       showNavItem: Ember.Route.transitionTo('subnav'),
+      showAccount: Ember.Route.transitionTo("specificAccount"),
       connectOutlets: function(router, context) {
         console.log(context);
         router.get("applicationController").connectOutlet("mainNav", "navigation");
