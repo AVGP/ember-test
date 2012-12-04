@@ -32,7 +32,6 @@ for(var a=0; a<3; a++) {
         });
         App.accounts[a].transactions.push(transaction);
     }
-    console.log(App.accounts[a].get("balance"));
 }
 
 //Generic + Navigation
@@ -95,20 +94,16 @@ App.Router = Ember.Router.extend({
       showNavItem: Ember.Route.transitionTo('subnav'),
       showAccount: Ember.Route.transitionTo("specificAccount"),
       connectOutlets: function(router, context) {
-        console.log(context);
         router.get("applicationController").connectOutlet("mainNav", "navigation");
         router.get("applicationController").connectOutlet("subNav", "accounts");
         router.get("applicationController").connectOutlet("content", "singleAccount", context);
       },
       serialize: function(router, context) {
-        console.log(context.get("id"));
         return { id: context.id };
       },
       deserialize: function(router, urlParams){
         console.log("Go for " + urlParams.id);
         for(var i=0, len = App.accounts.length; i<len; i++) {
-            console.log("This one has:");
-            console.log(App.accounts[i].get("id"));
             if(App.accounts[i].get("id") == urlParams.id) return App.accounts[i];
         }
         return null
