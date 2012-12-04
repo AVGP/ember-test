@@ -1,0 +1,57 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <script type="text/x-handlebars" data-template-name="application">
+            <h1>Hey ho</h1>
+            <div style="float:left;width:100px">{{outlet mainNav}}</div>
+            <div style="float:left;width:100px">{{outlet subNav}}</div>
+            <div style="margin-left: 250px;">{{outlet content}}</div>
+        </script>
+        
+        <script type="text/x-handlebars" data-template-name="navigation">
+            <ul>
+            {{#each navItem in controller}}
+                <li><a {{action showNavItem navItem.action}}>{{navItem.label}}</a></li>
+            {{/each}}
+            </ul>
+        </script>
+        
+<!-- Accounts templates -->        
+        <script type="text/x-handlebars" data-template-name="accounts">
+            <ul>
+            {{#each account in controller}}
+                <li>{{account.name}}</li>
+            {{/each}}
+            </ul>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="accountsContent">
+            <p>This is the allmighty account content</p>
+            <ul>
+            {{#each account in controller}}
+                <li>{{account.name}}</li>
+            {{/each}}            
+            </ul>
+        </script>
+
+<!-- Transactions templates -->
+        <script type="text/x-handlebars" data-template-name="transactions">
+            <ul>
+                <li>Boring stuff</li>
+                <li>Even more boring stuff</li>
+            </ul>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="transactionsContent">
+            <p>Behold the transactions content!</p>
+        </script>
+
+
+<!-- external stuff -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.rc.1/handlebars.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ember.js/1.0.0-pre.2/ember-1.0.0-pre.2.min.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
