@@ -4,6 +4,11 @@
     <body>
         <script type="text/x-handlebars" data-template-name="application">
             <h1>Hey ho</h1>
+            <p>
+                {{#each lang in langs}}
+                    <a {{action setLang lang target="view"}}>{{lang}}</a> &nbsp;|&nbsp;
+                {{/each}}
+            </p>
             <div style="float:left;width:100px">{{outlet mainNav}}</div>
             <div style="float:left;width:100px">{{outlet subNav}}</div>
             <div style="margin-left: 250px;">{{outlet content}}</div>
@@ -12,7 +17,7 @@
         <script type="text/x-handlebars" data-template-name="navigation">
             <ul>
             {{#each navItem in controller}}
-                <li><a {{action showNavItem navItem.action}}>{{navItem.label}}</a></li>
+                <li><a {{action showNavItem navItem.action}}>{{#bind navItem.label}}{{loc this}}{{/bind}}</a></li>
             {{/each}}
             </ul>
         </script>
@@ -62,6 +67,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.rc.1/handlebars.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/ember.js/1.0.0-pre.2/ember-1.0.0-pre.2.min.js"></script>
+        <!--script src="https://raw.github.com/jamesarosen/ember-i18n/master/dist/ember-i18n-latest.js"></script-->
         <script src="app.js"></script>
     </body>
 </html>

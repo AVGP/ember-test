@@ -1,6 +1,28 @@
-var App = Ember.Application.create();
+var App = Ember.Application.create({lang: "de"});
    
 App.accounts = [];
+
+App.strings = {
+    "en": {
+        "_Account": "Account",
+        "_Accounts": "Accounts",
+        "_Transactions": "Transactions"
+    },
+    "de": {
+        "_Account": "Konto",
+        "_Accounts": "Konten",
+        "_Transactions": "Transaktionen"
+    }    
+};
+App.langs = ["de", "en"];
+
+
+Em.Handlebars.registerHelper('loc', function(key){
+    Ember.STRINGS = App.strings[App.get("lang")];
+    console.log("Translating to" + App.get("lang"));
+    var prop = Ember.getPath(this, key);
+    return Ember.String.loc(prop.toString());
+});
 
 App.Account = Ember.Object.extend({
     balance: function() {
@@ -34,13 +56,33 @@ for(var a=0; a<3; a++) {
     }
 }
 
+App.mainMenu = Ember.Object.create({
+    items: Ember.A([
+        Ember.Object.create({action: "accounts", label: "_Accounts"}), 
+        Ember.Object.create({action: "transactions", label: "_Transactions"})
+    ])
+});
+
 //Generic + Navigation
 
-App.ApplicationController = Ember.Controller.extend();
-App.ApplicationView = Ember.View.extend({ templateName: 'application' });
+App.ApplicationController = Ember.Controller.extend({ lang: "de", langs: App.langs});
+App.ApplicationView = Ember.View.extend({ 
+    templateName: 'application', 
+    setLang: function(event) { 
+        App.set("lang",event.context); 
+        console.log(App.lang)
+    }, 
+    langChanged: function() { 
+        console.log("CHANGE");
+        Ember.STRINGS = App.strings[App.get("lang")]; 
+        //App.mainMenu.items.replace(0, 1, [{action: "accounts", label: "wtf"}]);
+    }.observes("App.lang") 
+});
 
-App.NavigationController = Ember.ArrayController.extend({content: [{action: "accounts", label: "Accounts"}, {action: "transactions", label: "Transactions"}]});
+App.NavigationController = Ember.ArrayController.extend({content: App.mainMenu.get("items")});
 App.NavigationView = Ember.View.extend({ templateName: "navigation" });
+
+//App.addObserver("lang", function() { Ember.STRINGS = App.strings[App.get("lang")]; console.log(Ember.STRINGS); App.ApplicationView.langChanged(); });
 
 //Accounts
 
@@ -68,7 +110,6 @@ App.Router = Ember.Router.extend({
       route: '/',
       
       showNavItem: Ember.Route.transitionTo('subnav'),
-      
       connectOutlets: function(router, context) {
           router.get("applicationController").connectOutlet("mainNav", "navigation");
       }
@@ -102,7 +143,6 @@ App.Router = Ember.Router.extend({
         return { id: context.id };
       },
       deserialize: function(router, urlParams){
-        console.log("Go for " + urlParams.id);
         for(var i=0, len = App.accounts.length; i<len; i++) {
             if(App.accounts[i].get("id") == urlParams.id) return App.accounts[i];
         }
