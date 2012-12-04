@@ -20,6 +20,7 @@ App.Transaction = Ember.Object.extend({
 
 for(var a=0; a<3; a++) {
     var account = App.Account.create({
+        id: a + 1,
         name: "Account #" + a,
         transactions: []
     });
@@ -27,12 +28,14 @@ for(var a=0; a<3; a++) {
     for(var t=0; t<3; t++) {
         var transaction = App.Transaction.create({
            subject: "Transaction #" + t + " on account #" + a,
-           amount: 100 * (t +1)
+           amount: 100 * (t +1),
+           id: a + t + 1
         });
         App.accounts[a].transactions.push(transaction);
     }
 }
 
+//Generic + Navigation
 
 App.ApplicationController = Ember.Controller.extend();
 App.ApplicationView = Ember.View.extend({ templateName: 'application' });
@@ -40,11 +43,18 @@ App.ApplicationView = Ember.View.extend({ templateName: 'application' });
 App.NavigationController = Ember.ArrayController.extend({content: [{action: "accounts", label: "Accounts"}, {action: "transactions", label: "Transactions"}]});
 App.NavigationView = Ember.View.extend({ templateName: "navigation" });
 
+//Accounts
+
 App.AccountsController = Ember.ArrayController.extend({content: App.accounts});
 App.AccountsView = Ember.View.extend({ templateName: "accounts" });
 
 App.AccountsContentController = Ember.ArrayController.extend({content: App.accounts});
 App.AccountsContentView = Ember.View.extend({ templateName: "accountsContent" });
+
+App.SingleAccountController = Ember.ObjectController.extend();
+App.SingleAccountView = Ember.View.extend({ templateName: "singleAccount" });
+
+//Transactions
 
 App.TransactionsController = Ember.Controller.extend();
 App.TransactionsView = Ember.View.extend({ templateName: "transactions" });
@@ -67,7 +77,8 @@ App.Router = Ember.Router.extend({
     subnav: Ember.Route.extend({
       route: '/:navItem',
       showNavItem: Ember.Route.transitionTo('subnav'),
-      connectOutlets: function(router, context) {
+      showAccount: Ember.Route.transitionTo("specificAccount"),
+      connectOutlets: function(router, context) { //The following lines are me being stupid (in lack of a better way of doing it)
           router.get("applicationController").connectOutlet("mainNav", "navigation");
           router.get("applicationController").connectOutlet("subNav", context);
           router.get("applicationController").connectOutlet("content", context+"Content");
@@ -78,7 +89,30 @@ App.Router = Ember.Router.extend({
       deserialize: function(router, urlParams){
         return urlParams.navItem;
       }
-    })    
+    }),
+    specificAccount: Ember.Route.extend({
+      route: '/accounts/:id',
+      showNavItem: Ember.Route.transitionTo('subnav'),
+      connectOutlets: function(router, context) {
+        console.log(context);
+        router.get("applicationController").connectOutlet("mainNav", "navigation");
+        router.get("applicationController").connectOutlet("subNav", "accounts");
+        router.get("applicationController").connectOutlet("content", "singleAccount", context);
+      },
+      serialize: function(router, context) {
+        console.log(context.get("id"));
+        return { id: context.id };
+      },
+      deserialize: function(router, urlParams){
+        console.log("Go for " + urlParams.id);
+        for(var i=0, len = App.accounts.length; i<len; i++) {
+            console.log("This one has:");
+            console.log(App.accounts[i].get("id"));
+            if(App.accounts[i].get("id") == urlParams.id) return App.accounts[i];
+        }
+        return null
+      }
+    })
   })
 });
 

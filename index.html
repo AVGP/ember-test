@@ -21,7 +21,7 @@
         <script type="text/x-handlebars" data-template-name="accounts">
             <ul>
             {{#each account in controller}}
-                <li>{{account.name}}</li>
+                <li><a {{action showAccount account}} >{{account.name}}</a></li>
             {{/each}}
             </ul>
         </script>
@@ -30,7 +30,16 @@
             <p>This is the allmighty account content</p>
             <ul>
             {{#each account in controller}}
-                <li>{{account.name}}</li>
+                <li><a{{action showAccount account}} >{{account.name}}</a></li>
+            {{/each}}            
+            </ul>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="singleAccount">
+            <p>Transactions of {{controller.name}}</p>
+            <ul>
+            {{#each transaction in controller.transactions}}
+                <li>{{transaction.subject}}</li>
             {{/each}}            
             </ul>
         </script>
