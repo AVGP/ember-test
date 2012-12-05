@@ -1,28 +1,63 @@
 var App = Ember.Application.create({lang: "de"});
-   
+
+///// This is the nasty shit. There is a open pull-request on Ember.js.    /////
+///// Hopefully it's merged soon!                                          /////
+////////////////////////////////////////////////////////////////////////////////
+
+var inlineFormatter = function(fn) {
+  return Ember.View.extend({
+    tagName: 'span',
+
+    template: Ember.Handlebars.compile('{{view.formattedContent}}'),
+
+    languageBinding: "App.lang",
+
+    formattedContent: (function() {
+      if (this.get('content') != null && this.get('language') != null) {
+        return fn(this.get('content'),this.get('language'));
+      }
+    }).property('language')
+  });
+};
+
+App.registerBoundHelper = function(name, view) {
+  Ember.Handlebars.registerHelper(name, function(property, options) {
+    if(Ember.getPath(this, property))
+        options.hash.contentBinding = property;
+    else //this is a string identifier, no binding!
+        options.hash.content = property;
+    return Ember.Handlebars.helpers.view.call(this, view, options);
+  });
+};
+
+// Alright, actual stuff starts:
+
 App.accounts = [];
 
 App.strings = {
     "en": {
         "_Account": "Account",
         "_Accounts": "Accounts",
-        "_Transactions": "Transactions"
+        "_Transactions": "Transactions",
+        "_Balance": "Balance"
     },
     "de": {
         "_Account": "Konto",
         "_Accounts": "Konten",
-        "_Transactions": "Transaktionen"
+        "_Transactions": "Transaktionen",
+        "_Balance": "Kontostand"
     }    
 };
 App.langs = ["de", "en"];
 
 
-Em.Handlebars.registerHelper('loc', function(key){
-    Ember.STRINGS = App.strings[App.get("lang")];
-    console.log("Translating to" + App.get("lang"));
+App.registerBoundHelper('loc', inlineFormatter(function(key, lang){
+    Ember.STRINGS = App.strings[lang];
     var prop = Ember.getPath(this, key);
-    return Ember.String.loc(prop.toString());
-});
+    if(prop) prop = prop.toString(); //Dynamic property from the controller/view
+    else prop = key; //Just pass the string through
+    return Ember.String.loc(prop);
+}));
 
 App.Account = Ember.Object.extend({
     balance: function() {
@@ -70,13 +105,7 @@ App.ApplicationView = Ember.View.extend({
     templateName: 'application', 
     setLang: function(event) { 
         App.set("lang",event.context); 
-        console.log(App.lang)
-    }, 
-    langChanged: function() { 
-        console.log("CHANGE");
-        Ember.STRINGS = App.strings[App.get("lang")]; 
-        //App.mainMenu.items.replace(0, 1, [{action: "accounts", label: "wtf"}]);
-    }.observes("App.lang") 
+    }
 });
 
 App.NavigationController = Ember.ArrayController.extend({content: App.mainMenu.get("items")});

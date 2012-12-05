@@ -42,7 +42,7 @@
 
         <script type="text/x-handlebars" data-template-name="singleAccount">
             <p>Transactions of {{controller.name}}</p>
-            <p>Balance is: {{controller.balance}}</p>
+            <p>{{loc _Balance}}: {{controller.balance}}</p>
             <ul>
             {{#each transaction in controller.transactions}}
                 <li>{{transaction.subject}}</li>
